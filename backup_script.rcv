@@ -1,0 +1,9 @@
+run {
+
+   allocate channel d1 type disk;
+   allocate channel d2 type disk;
+   backup  tag 'full_backup'   database
+   format '+DATA/prod_%d_t%t_s%s_p%p.rmn';
+   release channel d1;
+   release channel d2;
+}
