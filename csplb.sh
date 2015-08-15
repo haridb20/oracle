@@ -80,10 +80,57 @@ exit;
 EOM
 }
 
+## Create index
+function create_index()
+{
+sqlplus hari/hari@emrepus<<EOM
+CREATE INDEX spm_test_tab_idx ON spm_test_tab(id);
+EXEC DBMS_STATS.gather_table_stats(USER, 'SPM_TEST_TAB', cascade=>TRUE);
+
+SET AUTOTRACE TRACE
+
+SELECT description
+FROM   spm_test_tab
+WHERE  id = 99;
+EOM
+}
+#show plan not changed
+function create_index()
+{
+sqlplus hari/hari@emrepus<<EOM
+CREATE INDEX spm_test_tab_idx ON spm_test_tab(id);
+EXEC DBMS_STATS.gather_table_stats(USER, 'SPM_TEST_TAB', cascade=>TRUE);
+
+SET AUTOTRACE TRACE
+
+SELECT description
+FROM   spm_test_tab
+WHERE  id = 99;
+SELECT sql_handle, plan_name, enabled, accepted 
+FROM   dba_sql_plan_baselines;
+EOM
+
+echo "enter sql_handle value:"
+read sql_handle
+sqlplus hari/hari@emrepus<<EOM
+define sql_handle='$sql_handle'
+SET LONG 10000
+SELECT DBMS_SPM.evolve_sql_plan_baseline(sql_handle => '$sql_handle')
+FROM   dual;
+EOM
+}
+
+#evolve sql plan
+
+#accept new plan
+
+#drop old plan
+
+teardown
 setup
 run_sql_select
 display_sqlid
 load_plans
 display_plans
-teardown
 
+create_index
