@@ -1,0 +1,84 @@
+Step 1
+##############
+# **P = Primary
+# **S = Standby
+#############
+**P
+sqlplus "/ as sysdba"<<EOM
+  alter system set log_archive_dest_state_2='defer';
+  alter system switch logfile;
+  alter system switch logfile;
+  alter system switch logfile;
+  alter system switch logfile;
+exit;
+EOM
+
+rman target / <<EOM 
+delete force noprompt archivelog all;
+EOM
+
+sqlplus "/ as sysdba"<<EOM
+SELECT to_char(current_scn) from v\$database;
+exit;
+EOM
+
+rman target / <<EOM
+run{
+backup incremental from scn 19140471 database format '/tmp/bkp/%U.bkp'; ##-- This is the scn from standby;
+backup current controlfile for standby format '/tmp/bkp/SF_%u.ctl';
+}
+EOM
+**
+
+
+**S
+sqlplus "/ as sysdba"<<EOM
+alter database recover managed standby database cancel;
+EOM
+
+
+#As this asks for a prompt we have to do it manual not with a script.
+
+rman target /
+catalog start with '/tmp/bkp/';
+
+sqlplus "/ as sysdba"<<EOM
+alter database recover managed standby database cancel;
+EOM
+
+rman target /<<EOM
+recover database noredo;
+EOM
+
+sqlplus "/ as sysdba"<<EOM
+SELECT to_char(current_scn) from v\$database;
+exit;
+EOM
+
+sqlplus "/ as sysdba"<<EOM
+shutdown immediate;
+startup nomount;
+EOM
+--restore the standby controlfile;
+rman target /<<EOM
+restore standby controlfile from '/tmp/bkp/SF_1hqeqjgk.ctl';
+EOM
+
+srvctl stop database -d stdby
+srvctl start database -d stdby
+
+sqlplus "/ as sysdba"<<EOM
+alter database recover managed standby database disconnect from session;
+select process,status,sequence# from v\$managed_standby;
+EOM
+
+**P
+sqlplus "/ as sysdba"<<EOM
+select thread#,max(sequence#) from v\$archived_log group by thread#;
+EOM
+
+
+**S
+sqlplus "/ as sysdba"<<EOM
+select thread#,max(sequence#) from v$archived_log group by thread#;
+EOM
