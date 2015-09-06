@@ -1,0 +1,31 @@
+select snap_interval, retention from dba_hist_wr_control;
+
+SNAP_INTERVAL       RETENTION
+------------------- -------------------
++00000 01:00:00.0   +00007 00:00:00.0
+
+or
+select dbms_stats.get_stats_history_availability from dual;
+select dbms_stats.get_stats_history_retention from dual;
+
+This SQL shows that the snapshots are taken every hour and the collections are retained for 7 days
+
+If you want to extend that retention period you can execute:
+execute dbms_workload_repository.modify_snapshot_settings(
+      interval => 60,        -- In Minutes. Current value retained if NULL.
+      retention => 43200);   -- In Minutes (= 30 Days). Current value retained if NULL
+
+
+select * from TABLE(dbms_xplan.display_awr('a9j69t1bh6982'));
+
+SELECT * FROM dba_hist_snapshot;
+
+SELECT output FROM TABLE(
+   DBMS_WORKLOAD_REPOSITORY.AWR_REPORT_TEXT(
+     &dbid,  1, &beg_snap, &end_snap) ) ;
+
+
+select * from TABLE(DBMS_WORKLOAD_REPOSITORY.awr_diff_report_html(&dbid,1,&beg_snap,&end_snap,
+                                                                  &dbid,1,&8971,&end_snap)); 
+
+

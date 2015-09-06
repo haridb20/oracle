@@ -12,4 +12,5 @@ oem12c_agent
 goldengate
 ssh
 stats
+AWR
 QUIT

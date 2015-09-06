@@ -57,6 +57,10 @@ do
          echo "Displaying various commands";
          cat oem12c_agent.txt
          ;;
+        awr)
+         echo "Displaying various commands";
+         cat awr.txt
+         ;;
         **)
           echo "You chose $OPTION ($REPLY)"
           ;;
