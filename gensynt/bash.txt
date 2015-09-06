@@ -1,0 +1,17 @@
+typeset is declaration
+eval example: 
+myx=1 ; myy="myx" ; eval echo '$'$myy
+
+while example:
+echo "hello">a.txt; while read i; do echo $i; done<a.txt; rm -i a.txt;
+
+###################
+# Example of data population basd on array.
+data=($(
+while read line
+do
+  echo -n "${line} "
+done < options.txt
+))
+
+###################

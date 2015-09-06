@@ -1,0 +1,9 @@
+AGENT
+
+$AGENT_HOME/core/12.1.0.4/bin/emctl status agent
+$AGENT_HOME/core/12.1.0.4/bin/emctl stop agent
+$AGENT_HOME/core/12.1.0.4/bin/emctl upload agent
+
+LOGS
+$AGENT_HOME/log/sysman/log/emoms.log
+

@@ -1,0 +1,15 @@
+0null
+adrci
+sqlplus
+_rman
+bash
+dataguard
+srvctl
+crsctl
+plsql
+oem12c_oms
+oem12c_agent
+goldengate
+ssh
+stats
+QUIT

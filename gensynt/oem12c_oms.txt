@@ -1,0 +1,5 @@
+$OMS_HOME/bin/emctl start oms
+$OMS_HOME/bin/emctl status oms
+$OMS_HOME/bin/emctl stop oms
+
+blackout

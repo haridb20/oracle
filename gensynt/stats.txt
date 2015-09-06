@@ -1,0 +1,54 @@
+-- Enable incremental statistics on the Orders2 table
+BEGIN
+ dbms_stats.set_table_prefs('HARIG','ORDERS2','INCREMENTAL','TRUE');
+ --dbms_stats.gather_table_stats(ownname=>'HARIG',objtype=>'TABLE',objname=>'ORDERS2',partname=>'ORDERS_DEC_2012');
+--dbms_stats.gather_table_stats ('HARIG','ORDERS2',partname=>'ORDERS_DEC_2012',granularity=>'PARTITION');
+END;
+/
+
+--Check that the preference was set correctly
+SELECT dbms_stats.get_prefs('INCREMENTAL','HARIG','ORDERS2')
+FROM   dual;
+
+-- Gather statistics on the ORDERS2 table
+BEGIN
+-- dbms_stats.gather_table_stats('HARIG','ORDERS2');
+dbms_stats.gather_table_stats ('HARIG','ORDERS2');
+--,partname=>'ORDERS_DEC_2012',granularity=>'PARTITION');
+
+END;
+/
+
+-- Check the last_analyzed date for the ORDERS2 table and its partitions
+SELECT table_name, to_char(last_analyzed, 'DD-MON-YYYY, HH24:MI:SS')  last_analyze
+FROM   user_tables
+WHERE   table_name='ORDERS2';
+
+SELECT   partition_name,  to_char(last_analyzed, 'DD-MON-YYYY, HH24:MI:SS') last_analyze
+FROM     user_tab_partitions
+WHERE    table_name='ORDERS2'
+ORDER BY partition_position;
+
+-- Check the actual column stats
+SELECT column_name, num_distinct, num_nulls
+FROM   user_tab_col_statistics
+WHERE   table_name='ORDERS2';
+-- Regather statistics on the ORDERS2 table
+BEGIN
+ dbms_stats.gather_table_stats('HARIG','ORDERS2');
+--,GRANULARITY=>'PARTITION',PARTITION=>'ORDERS_DEC_2012');
+--dbms_stats.gather_table_stats ('HARIG','ORDERS2',partname=>'ORDERS_DEC_2012',granularity=>'PARTITION');
+
+END;
+/
+
+-- lets check the last_analyzed date for the ORDERS2 table and its paritions
+SELECT table_name, to_char(last_analyzed, 'DD-MON-YYYY, HH24:MI:SS') last_analyze
+FROM   user_tables
+WHERE   table_name='ORDERS2';
+
+SELECT   partition_name, to_char(last_analyzed, 'DD-MON-YYYY, HH24:MI:SS') last_analyze
+FROM     user_tab_partitions
+WHERE    table_name='ORDERS2'
+ORDER BY partition_position;
+

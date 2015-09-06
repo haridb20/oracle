@@ -1,0 +1,47 @@
+varray
+
+SELECT * FROM DBA_SCHEDULER_JOBS;
+
+delcare
+begin
+end;
+/
+
+
+#Collection
+#
+
+#Bulk Collect
+set serveroutput on
+declare
+  type l_auto is table of auto%rowtype;
+  l_rec l_auto;
+  cursor c_rec is select * from auto ;
+begin
+  open c_rec;
+  loop
+  fetch c_rec bulk collect into l_rec limit 100;
+  for i in 1 .. l_rec.count loop
+    dbms_output.put_line( l_rec(i).id) ;
+  end loop;
+  exit when l_rec.count = 0;
+  end loop;
+end;
+/
+
+#for All
+declare
+TYPE l_coll is table of auto%rowtype;
+l_rec l_coll;
+i pls_integer;
+begin
+l_rec:=l_coll();
+for i in 1 .. 10000 loop
+l_rec.extend();
+l_rec(i).id:=i;
+l_rec(i).nm:='auto'||i ;
+end loop;
+forall i in l_rec.first .. l_rec.last insert into auto (id,nm)values ( l_rec(i).id,l_rec(i).nm) ;
+end;
+/
+

@@ -1,0 +1,11 @@
+srvctl status instance -d <DB_NAME> -i <insance_name>
+srvctl status database -d <DB_NAME>
+srvctl start instance -d <DB_NAME> -i <instance_name>
+srvctl stop instance -d <DB_NAME> -i <instance_name>
+
+srvctl relocate service -s 
+
+
+srvctl add database -d db_name -h /u01/app/ -r PHYSICAL_STANDBY
+
+

@@ -1,0 +1,11 @@
+adrci> set home diag/rdbms/DB1/DB11
+adrci> show control
+
+To purge core files older than 6 days
+adrci> purge -age 8640 -type CDUMP
+It might be needed to also run the following additional command:
+  
+adrci> purge -age 8640 -type UTSCDMP
+-> to remove sub-folders >6 days-old having a name like "CDMP_" from TRACE.
+Purge XML based Alert log file:
+adrci> purge -age 60 -type ALERT

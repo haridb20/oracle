@@ -1,0 +1,61 @@
+select process, client_process, thread#, sequence#, status from v$managed_standby;
+select * from v$dataguard_status;
+ps -aef|grep -i mrp
+show parameter log_archive_dest_state_2;
+alter system set log_archive_dest_state_2='enable';
+alter system set log_archive_dest_state_2='defer';
+orapwd file=$ORACLE_HOME/dbs/orapw<SID> entries=5 # In this case <SID> is instance name 1 to 10
+alter database recover managed standby cancel;
+alter database recover managed standby database using current logfile disconnect;
+alter database recover managed standby disconnect from session;
+# Choose what level of protection you require
+sql> alter database set standby to maximize performance;
+sql> alter database set standby to maximize availability;
+sql> alter database set standby to maximize protection;
+#REDO apply rate
+select to_char(snapshot_time, 'dd-mon-rr hh24:mi:ss') snapshot_time,
+       thread#, sequence#, applied_scn, apply_rate
+       from v$standby_apply_snapshot;
+
+# Use the thread# when using RAC an detect missing sequences 
+select thread#, low_sequence#, high_sequence# from v$archive_gap;
+Complete Switchover	## Start the switcover on the original primary 
+alter database commit to switchover to standby;
+######################
+## On the new primary complete the switchover
+alter database commit to switchover to primary;
+## Now open the database on the new primary
+alter database open;
+Complete Failover	
+## Start the failover
+alter database commit to switchover to primary;
+# Change the level of protection that you require
+sql> alter database set standby to maximize performance;
+sql> alter database set standby to maximize availability;
+sql> alter database set standby to maximize protection;
+######################
+
+ALTER SYSTEM SET LOG_ARCHIVE_CONFIG='DG_CONFIG=(DB11G,DB11G_STBY)';
+ALTER SYSTEM SET LOG_ARCHIVE_DEST_2='SERVICE=db11g_stby NOAFFIRM ASYNC VALID_FOR=(ONLINE_LOGFILES,PRIMARY_ROLE) DB_UNIQUE_NAME=DB11G_STBY';
+DB11G =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = ol5-112-dga1)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = DB11G.WORLD)
+    )
+  )
+
+DB11G_STBY =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = ol5-112-dga2)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = DB11G.WORLD)
+    )
+  )
+
+
+

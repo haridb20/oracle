@@ -1,0 +1,5 @@
+crsctl check crs
+crsctl stop crs 
+crsctl start crs
+crsctl stat res -t
+

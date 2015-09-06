@@ -1,0 +1,26 @@
+delete archivelog all;
+delete noprompt archivelog all;
+crosscheck archivelog all;
+list archivelog all;
+delete archivelog from sequence 1000 until sequence 1500;
+delete noprompt archivelog until time ‘SYSDATE-10′;
+BACKUP DATABASE PLUS ARCHIVELOG;
+BACKUP ARCHIVELOG ;
+configure 
+
+VALIDATE DATABASE;
+
+CONFIGURE DEFAULT DEVICE TYPE TO DISK;
+CONFIGURE DEVICE TYPE DISK BACKUP TYPE TO COMPRESSED BACKUPSET;
+CONFIGURE DEVICE TYPE sbt BACKUP TYPE TO COMPRESSED BACKUPSET;
+
+
+list backup summary;
+
+list backup of archivelog all;
+
+restore validate archivelog all;
+
+select min_first_change#,max_next_change# from v$backup_archivelog_summary;
+
+
